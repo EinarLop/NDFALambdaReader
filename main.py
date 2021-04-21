@@ -1,19 +1,19 @@
 import re
-with open("./test1.txt", "r") as f:
+
+#Open txt file
+with open("./test2.txt", "r") as f:
   contents = f.read().splitlines()
  
- 
-
+#Save first 4 lines as variables(states,alphabet, initialStates, finalStates) 
 states = contents[0].split(",")
 alphabet=contents[1].split(",")
 initialState = contents[2]
 finalStates = contents[3].split(",")
 
 
+
+#Create array with transitions read from line 5 to end of the file
 transitions =[]
-
-completedDictionaries = []
-
 for i in range(4, len(contents)):
   transition = {
   "state": "",
@@ -28,15 +28,10 @@ for i in range(4, len(contents)):
     transition["result"].append(current[j])
   transitions.append(transition)
 
-#print(transitions)
+#Initialized array to save all completed dicronaries
+completedDictionaries = []
 
-# print(states)
-# print(alphabet)
-# print(initialState)
-# print(finalStates)
-# print(contents)
-
-
+#Create a dictonaries for every state with empty transition array
 for state in states:
   dictionary = {
   "state": "",
@@ -52,108 +47,61 @@ for state in states:
   for finalstate in finalStates:
     if state == finalstate:
       final = True
+      #Add transitions to a temp array to then add them to the state's dictionary 
+      #Comparing if current state has any transition in transitions array  
   for trans in transitions:
     if state == trans["state"]:
        tran.append({
          "character":trans["character"],
          "states": trans["result"]
    })
-
+ 
+  #Assign the temp array to transitons dictonary of current state
   dictionary["transitions"] = tran
-
+  #Assign other variables to dictionary attributes
   dictionary["state"]= state
   dictionary["initialState"]=initial
   dictionary["finalState"]=final
-  print("==============")
-  # print(dictionary)
+  
+  #Add current dictonary to an array of completedDictionaries
   completedDictionaries.append(dictionary)
 
 
 
-#print(completedDictionaries)
-
-
-# {
-#   {
-#     "state": "q0",
-#     "initialState": True,
-#     "finalState": False,
-#     "transitions": [
-#       {
-#         "alphabet": "a",
-#       "states": ["q0","q1"]
-#       },
-#       {
-#       "alphabet": "b",
-#       "states": ["q2","q3"]
-#       }
-#       ]
-#   }
-# } 
-
-
-
-
-
-
-# function (){
-#   #Base case
-#   if string.length = 0
-#     return initialState
-
-#   else
-#   extendedTransitionFunction(transitionfunction(char))
-
-
-# }
-
-
-
+# Simple transition function
 def transition(state, character):
   current = {}
   for dic in completedDictionaries:
     if dic["state"] == state:
       current=dic
-      #print(current)
       for trans in current["transitions"]:
         if trans["character"] == character:
           return trans["states"]
 
+# print(completedDictionaries)
+# print("=============")
+# print(transition("q3", "b"))
 
-#def extendedTransition():
-
-  #xtendedTransitionFunction(transition())
-
-def findLambdaStates(lambdaStates):
-  s = []
-  for j in lambdaStates:
-    for i in completedDictionaries:
-      if lambdaStates[j] == completedDictionaries["state"]:
-        s.append(lambdaStates[j])
-
+def lambdaf(lambdaStates):
   
-
-
-print(completedDictionaries)
-def lambdaf(self,lambdaStates):
-  
+  visitados = []
+  result = lambdaStates
  
-  
-  if s == lambdaStates:
-    return lambdaStates
-
-  elif transition(s,"lambda") not in lambdaStates:
-    lambdaf(transition(s, "lambda"))
+  for state in result:
+   
     
-  
-  
+    current = transition(state,"lambda")
+    if current != None:
+      for tran in current:
+        
+        if tran not in visitados:
+         
+          visitados.append(tran)
+          result.append(tran)
+       
+  return result
 
+print(lambdaf(["q0"]))
 
-      
- 
-  
-
-
-#transition("q6", "b")
 
 
