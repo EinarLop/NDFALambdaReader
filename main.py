@@ -4,12 +4,11 @@ import re
 with open("./test1.txt", "r") as f:
   contents = f.read().splitlines()
  
-#Save first 4 lines as variables(states,alphabet, initialStates, finalStates) 
+#Save first 4 lines as variables(states,alphabet, initialStates, finalStates)
 states = contents[0].split(",")
 alphabet=contents[1].split(",")
 initialState = contents[2]
 finalStates = contents[3].split(",")
-
 
 
 #Create array with transitions read from line 5 to end of the file
@@ -116,9 +115,7 @@ def extendedTransition(qi,toProcess):
     if len(toProcess)==1:
       
       for state in lambdaf([qi]):
-        print("state",state)
         if transition(state,toProcess) != None:
-          print("Appended")
           result.append(transition(state,toProcess))
         
       return result
@@ -129,7 +126,48 @@ def extendedTransition(qi,toProcess):
       #  transition(extendedTransition(state,toProcess[:-1]),toProcess[-1])
 
 
-print(extendedTransition("q0", "ab"))
+def xTest(qi, toProcess,results):
+  
+  print(toProcess)
+  states = lambdaf([qi])
+  result = results
+  for state in states:
+    #print("string",toProcess[-1])
+
+    if len(toProcess)==0:
+      return qi
+    
+    if len(toProcess)==1:
+     
+      for res in states:
+        transition(res, toProcess)
+        if transition(res,toProcess) != None:
+          if isinstance(lambdaf(res), str): 
+            result = result + [transition(res,toProcess)]
+          else:
+            result = result + transition(res,toProcess)
+      return result
+
+    else:
+      print("First char string: ", toProcess[0])
+      if transition(state, toProcess[0]) != None:
+        result=result + transition(state, toProcess[0])
+        for res in result:
+          if  lambdaf(res) != None:
+            if isinstance(lambdaf(res), str): 
+              result = result + [lambdaf(res)]
+            else:
+              result = result + lambdaf(res)
+            
+      for ans in result:
+        print("last",toProcess[1:])
+        return xTest(ans,toProcess[1:],result)
+    
+
+print(xTest("q0", "bba", []))    
+
+
+#print(extendedTransition("q0", "a"))
 
 
   
