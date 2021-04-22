@@ -124,10 +124,12 @@ def extendedTransition(qi,toProcess):
       return result
       
     else:
-       transition(extendedTransition(qi,toProcess[:-1]),toProcess[-1])
+      for state in extendedTransition(state,toProcess[:-1]):
+        transition(state, toProcess[-1])
+      #  transition(extendedTransition(state,toProcess[:-1]),toProcess[-1])
 
 
-print(extendedTransition("q0", "a"))
+print(extendedTransition("q0", "ab"))
 
 
   
