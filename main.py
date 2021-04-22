@@ -1,7 +1,7 @@
 import re
 
 #Open txt file
-with open("./test2.txt", "r") as f:
+with open("./test1.txt", "r") as f:
   contents = f.read().splitlines()
  
 #Save first 4 lines as variables(states,alphabet, initialStates, finalStates) 
@@ -76,9 +76,11 @@ def transition(state, character):
       current=dic
       for trans in current["transitions"]:
         if trans["character"] == character:
-          return trans["states"]
+          if len(trans["states"] )!= 0:
+            return trans["states"]
+          
 
-# print(completedDictionaries)
+#print(completedDictionaries)
 # print("=============")
 # print(transition("q3", "b"))
 
@@ -88,8 +90,6 @@ def lambdaf(lambdaStates):
   result = lambdaStates
  
   for state in result:
-   
-    
     current = transition(state,"lambda")
     if current != None:
       for tran in current:
@@ -101,7 +101,52 @@ def lambdaf(lambdaStates):
        
   return result
 
-print(lambdaf(["q0"]))
+ #print(lambdaf(["q0"]))
 
 
+def extendedTransition(qi,toProcess):
 
+  result = []
+
+  #BASE CASE: The String is empty
+  if len(toProcess)==0:
+    return lambdaf([qi])
+
+  else:
+    if len(toProcess)==1:
+      
+      for state in lambdaf([qi]):
+        print("state",state)
+        if transition(state,toProcess) != None:
+          print("Appended")
+          result.append(transition(state,toProcess))
+        
+      return result
+      
+    else:
+       transition(extendedTransition(qi,toProcess[:-1]),toProcess[-1])
+
+
+print(extendedTransition("q0", "a"))
+
+
+  
+# test = "hola"
+
+# #Quitar primero
+# print(test[1:])
+# #Quitar ultimo
+# print(test[:-1])
+# #Último character
+# print(test[-1])
+
+
+#Extended transtion -> q0, lamba ->q0
+# Extended transition(1st char)
+  #transition normal(char que se agrego)
+  #lambdaf(transition normal)
+#le meto el segundo char a extended
+#extended(1st char + 1)
+  #solo uso el ultimo char que se agrego!!
+  #transition normal(char que se agrego)
+#se sigue hasta que extended transition complete el string 
