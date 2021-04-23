@@ -1,7 +1,8 @@
 import re
+import numpy as np
 
 #Open txt file
-with open("./test3.txt", "r") as f:
+with open("./test1.txt", "r") as f:
   contents = f.read().splitlines()
  
 #Save first 4 lines as variables(states,alphabet, initialStates, finalStates)
@@ -173,10 +174,11 @@ def lastTry(qi, word):
     return estadosLambda
   
   while(len(word) != 0):
+    
     temp =[]
     for state in estadosLambda:
      if transition(state,word[0]) != None:
-      temp = temp + (transition(state,word[0])) #POSIBLE ERROR ARRAY DENTRO ARRAY
+      temp = temp + (transition(state,word[0])) 
     estadosLambda = []
    
     for newLState in temp:
@@ -184,11 +186,18 @@ def lastTry(qi, word):
        estadosLambda.append(lambdaf(newLState))
     
     word=word[1:]
-  return estadosLambda
+  
+  tempEL = []
+  for lState in estadosLambda:
+      tempEL.append(lambdaf([lState]))
+      finished = np.array([tempEL])
+      finished =finished.flatten()
+      finished2 = np.unique(finished)
+      
+    
+  return finished2
 
-
-
-print(lastTry("q0", "bbbb"))
+print(lastTry("q0", ""))
     
 
 #q1,q3,q4,q5,q6,q7
