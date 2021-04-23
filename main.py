@@ -1,5 +1,5 @@
 import re
-import numpy as np
+
 
 """Summary
 Within this program, you will be able to process a string of n characters in order to know if it accepted in the Non Deterministic Automata with lambda (NDFA-lambda) of the text File 1, found as test1.txt. 
@@ -161,11 +161,7 @@ def evaluateString(qi, word):
       tempEL.append(lambdaf(lState))
 
   print("")
-  
-
-  # finished = np.array([tempEL])
-  # finished =finished.flatten()
-  # finished2 = np.unique(finished)  
+    
   return tempEL
 
 
@@ -186,26 +182,28 @@ def menu():
     print("1. Evaluate a String")
     print("2. Exit")
     
-    option= input("Please enter an option :")
+    option= input("Please enter an option: ")
     print("")
     if option == "1":
       stri = ""
       
       print("Note: If you want to load your own Automata please copy-paste it in test1.txt")
       print("---------------------------")
-      stri= input("Enter the String you want to evaluate :")
+      stri= input("Enter the String you want to evaluate: ")
       print("")
       evaluatedString = evaluateString("q0",stri)
       print("Final set of states", evaluatedString)
       print("")
 
       print("List of final states in the automata", finalStates)
-      print("---------------------------")
+      print("")
       if isFinalState(evaluatedString):
         print("The string is accepted")
       else:
         print("The string is not accepted")
-      print("---------------------------")
+     
+      print("")
+    
       
     elif option == "2":
         exit = True
