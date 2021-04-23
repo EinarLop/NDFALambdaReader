@@ -1,7 +1,7 @@
 import re
 
 #Open txt file
-with open("./test1.txt", "r") as f:
+with open("./test3.txt", "r") as f:
   contents = f.read().splitlines()
  
 #Save first 4 lines as variables(states,alphabet, initialStates, finalStates)
@@ -20,6 +20,7 @@ for i in range(4, len(contents)):
   "result": []
 }
   current = re.split(",|=>",contents[i])
+ 
   transition["state"] = current[0]
   transition["character"] = current[1]
 
@@ -100,93 +101,97 @@ def lambdaf(lambdaStates):
        
   return result
 
- #print(lambdaf(["q0"]))
 
-
-def extendedTransition(qi,toProcess):
-
-  result = []
-
-  #BASE CASE: The String is empty
-  if len(toProcess)==0:
-    return lambdaf([qi])
-
-  else:
-    if len(toProcess)==1:
-      
-      for state in lambdaf([qi]):
-        if transition(state,toProcess) != None:
-          result.append(transition(state,toProcess))
-        
-      return result
-      
-    else:
-      for state in extendedTransition(state,toProcess[:-1]):
-        transition(state, toProcess[-1])
-      #  transition(extendedTransition(state,toProcess[:-1]),toProcess[-1])
-
+ ##############################################
 
 def xTest(qi, toProcess,results):
   
-  print(toProcess)
   states = lambdaf([qi])
   result = results
-  for state in states:
-    #print("string",toProcess[-1])
 
-    if len(toProcess)==0:
-      return qi
-    
-    if len(toProcess)==1:
-     
-      for res in states:
-        transition(res, toProcess)
-        if transition(res,toProcess) != None:
-          if isinstance(lambdaf(res), str): 
-            result = result + [transition(res,toProcess)]
-          else:
-            result = result + transition(res,toProcess)
-      return result
+  if len(toProcess)==0:
+    return qi
+  
+  if len(toProcess)==1:
+    for res in states:
+      transition(res, toProcess)
+      if transition(res,toProcess) != None:
+        if isinstance(lambdaf(res), str): 
+          result = result + [transition(res,toProcess)]
+        else:
+          result = result + transition(res,toProcess)
+    return result
 
-    else:
-      print("First char string: ", toProcess[0])
+  else:
+    for state in states:
       if transition(state, toProcess[0]) != None:
         result=result + transition(state, toProcess[0])
+     
         for res in result:
           if  lambdaf(res) != None:
             if isinstance(lambdaf(res), str): 
               result = result + [lambdaf(res)]
             else:
               result = result + lambdaf(res)
-            
-      for ans in result:
-        print("last",toProcess[1:])
-        return xTest(ans,toProcess[1:],result)
+      
+    result = list(set(result))
+
+    for ans in result:
+      return xTest(ans,toProcess[1:],result)
     
 
-print(xTest("q0", "bba", []))    
+#print(xTest("q0", "ab", []))    
 
 
-#print(extendedTransition("q0", "a"))
+
+#itTrans(qi,string)
+# 
+# estadosLambda=lamdaf(qi)
+
+# string.len = 0
+#   estadosLambda
+
+# while(sting.len != 1)
+
+# evaluar primer char de strig en trans function normal
+# usando estadosLambda como state
+
+# evaluamos lambda de todos los estados antes mencionados = lambda states
+
+# quitamos un char del string
+# =================
 
 
+
+
+
+def lastTry(qi, word):
+  estadosLambda = lambdaf([qi])
   
-# test = "hola"
 
-# #Quitar primero
-# print(test[1:])
-# #Quitar ultimo
-# print(test[:-1])
-# #Último character
-# print(test[-1])
+  if len(word)==0:
+    return estadosLambda
+  
+  while(len(word) != 0):
+    temp =[]
+    for state in estadosLambda:
+     if transition(state,word[0]) != None:
+      temp = temp + (transition(state,word[0])) #POSIBLE ERROR ARRAY DENTRO ARRAY
+    estadosLambda = []
+   
+    for newLState in temp:
+     if lambdaf(newLState) != None:
+       estadosLambda.append(lambdaf(newLState))
+    
+    word=word[1:]
+  return estadosLambda
 
 
-#Extended transtion -> q0, lamba ->q0
-# Extended transition(1st char)
-  #transition normal(char que se agrego)
-  #lambdaf(transition normal)
-#le meto el segundo char a extended
-#extended(1st char + 1)
-  #solo uso el ultimo char que se agrego!!
-  #transition normal(char que se agrego)
-#se sigue hasta que extended transition complete el string 
+
+print(lastTry("q0", "bbbb"))
+    
+
+#q1,q3,q4,q5,q6,q7
+
+      
+  
