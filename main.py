@@ -1,182 +1,155 @@
 import re
-
-
 """Summary
-Within this program, you will be able to process a string of n characters in order to know if it accepted in the Non Deterministic Automata with lambda (NDFA-lambda) of the text File 1, found as test1.txt. 
-
-If you want to try another Automata you should change the input from the method with open.
+Within this program, you will be able to process a string of n characters in order to know if it accepted in the Non Deterministic Automata with lambda (NDFA-lambda) of your text file. 
 """
 
-with open("./test2.txt", "r") as f:
-  """Opens the text file where the Automata is defined.
-  
-  Saves the first 4 lines as variables, 1- states, 2- alphaber, 3- initial states, 4- final states in dictionaries.
-
-  Parameters
-  ------
-  file: the file where the Automata is defined.
-  r: the mode in which we want to open the file, read.
-  """
-  contents = f.read().splitlines()
- 
-states = contents[0].split(",")
-alphabet=contents[1].split(",")
-initialState = contents[2]
-finalStates = contents[3].split(",")
-
-#Create array with transitions read from line 5 to end of the file
-transitions =[]
-for i in range(4, len(contents)):
-  transition = {
-  "state": "",
-  "character":"",
-  "result": []
-}
-  current = re.split(",|=>",contents[i])
- 
-  transition["state"] = current[0]
-  transition["character"] = current[1]
-
-  for j in range(2, len(current)):
-    transition["result"].append(current[j])
-  transitions.append(transition)
-
-#Initialized array to save all completed dictionaries
-completedDictionaries = []
-
-#Create dictonaries for every state with empty transition array
-for state in states:
-  dictionary = {
-  "state": "",
-    "initialState": "",
-    "finalState": "",
-    "transitions": []    
-}
-  initial = False
-  final = False
-  tran = []
-  if state == initialState:
-    initial= True
-  for finalstate in finalStates:
-    if state == finalstate:
-      final = True
-      #Adds transitions to a temp array to then add them to the state's dictionary 
-      #Comparing if current state has any transition in transitions array  
-  for trans in transitions:
-    if state == trans["state"]:
-       tran.append({
-         "character":trans["character"],
-         "states": trans["result"]
-   })
- 
-  #Assign the temp array to transitons dictonary of current state
-  dictionary["transitions"] = tran
-  #Assign other variables to dictionary attributes
-  dictionary["state"]= state
-  dictionary["initialState"]=initial
-  dictionary["finalState"]=final
-  
-  #Add current dictonary to an array of completedDictionaries
-  completedDictionaries.append(dictionary)
+dic = {}
 
 
+def initialSetup(filename):
+  """Sets up the name of the file in which the Automata is defined, and reads its content. 
 
-# Simple transition function
-def transition(state, character):
-  """
-  Processes the string with the transition function and returns a set of transitions.
+  In the function with open, it saves the first 4 lines as variables, 1- states, 2- alphaber, 3- initial states, 4- final states in dictionaries.
 
   Parameters
   -------
-  state: the state of the Automata
-  character: the character that creates a transition with the state
+  filename: The file where the Automata is defined.
   """
-  current = {}
-  for dic in completedDictionaries:
-    if dic["state"] == state:
-      current=dic
-      for trans in current["transitions"]:
-        if trans["character"] == character:
-          if len(trans["states"] )!= 0:
-            return trans["states"]
-          
-def lambdaf(lambdaStates):
+  
+  with open("./" + filename , "r") as f:
+    contents = f.read().splitlines()
+    
+  states = contents[0].split(",")
+  alphabet=contents[1].split(",")
+  alphabet.append("lambda")
+  initialState = contents[2]
+  global finalStates 
+  finalStates= contents[3].split(",")
+  
+ 
+  def generateStates():
+    """
+    Generates the states for the Automata.
+    """
+    for state in states:
+      dic[state]= {}
+      
+  generateStates()
+  
+
+  def generateTransitions():
+    """
+    Generates the transitions on the file, saving them on the dictionary.
+    """
+    for i in range(4, len(contents)):
+      current = re.split(",|=>",contents[i])
+      currentTransitions = current[2:]
+      for character in alphabet:
+        if character not in dic[current[0]]:
+          dic[current[0]][character]= []
+      dic[current[0]][current[1]] = currentTransitions
+      
+  generateTransitions()
+
+
+
+###################################################
+def transitionFunction(state, character):
   """
-  Processes states with the lambda function, returning a list of results.
+  Processes the string with the transition function and returns a dictionary with the transitions.
 
   Parameters
-  ------
-  lambdaStates: the states which are going to be processed with the lambda function
+  -----
+  state: the state of the Automata
+  character: the character that has a transition with the state.
   """
-  visitados = []
-  result = lambdaStates
+  return dic[state][character]
+###################################################
+
+
+###################################################
+def lambdaFunction(state):
+  """
+  Processes the states with the lambda function, returning a set of states.
+
+  Parameters
+  -----
+  states: The states that are going to be processed with the lambda function.
+
+  """
+  visited = []
+  result=[]
+  result.append(state)
  
   for state in result:
-    current = transition(state,"lambda")
+    current= transitionFunction(state, "lambda")
     if current != None:
-      for tran in current:
-        
-        if tran not in visitados:
-         
-          visitados.append(tran)
-          result.append(tran)
-       
+      for state in current:
+        if state not in visited:
+          visited.append(state)
+          result.append(state)
   return result
+###################################################
 
 
-def evaluateString(qi, word):
-  estadosLambda = lambdaf([qi])
+##################################################
+def etf(state, string):
+  """
   
-  print("Lambda closure of q0: ", estadosLambda )
-  print("")
-  
-
-  if len(word)==0:
-    return estadosLambda
-  
-  while(len(word) != 0):
-    print("Currently processing char: ",word[0] )
-    print("")
-    temp =[]
-    for state in estadosLambda:
-     if transition(state,word[0]) != None:
-      print("Normal transition:", state,",",word[0], "=>", transition(state,word[0]))
-      temp = temp + (transition(state,word[0])) 
-    estadosLambda = []
-    print("Set of states obtained from the normal transition",temp)
-    print("")
-    for newLState in temp:
-     if lambdaf(newLState) != None:
-       print("Lambda clousure:", newLState, "=>", lambdaf(newLState))
-       estadosLambda.append(lambdaf(newLState))
-    print("Set of states obtained from the lambda clousure",estadosLambda)
-    print("")
+  """
+  if len(string) == 1:
+    return lambdaFunction(state)
+  else:
+    firstPart = string[:-1]
+    lastChar= string[-1]
+    # print(firstPart, lastChar)
     
-    word=word[1:]
-  
-  tempEL = []
-  print("Last lambda closures to get the final states")
-  for lState in estadosLambda:
-      print("Lambda clousure:", lState, "=>", lambdaf(lambdaf(lState)))
-      tempEL.append(lambdaf(lState))
-
-  print("")
+    etfRes = etf("q0", firstPart)
     
-  return tempEL
+    print("Processing the transition function with:", lastChar)
+    tfRes=[]
+    
+    for etfState in etfRes:
+      print(f'Processing the transition function of: {etfState} with {lastChar}')
+      current = transitionFunction(etfState, lastChar)
+      for c in current:
+       if c not in tfRes:
+         tfRes.append(c)
+      # print("The result of the extended transition function is:", tfRes)
+
+    lfRes = []
+   
+    for tfState in tfRes:
+      print("Processing the lambda funtion of:", tfState)
+      curr = lambdaFunction(tfState)
+      for cu in curr:
+        if cu not in lfRes:
+         lfRes.append(cu)
+
+    return lfRes
+###################################################
 
 
-def isFinalState(states):
+def isFinalState(finalStates, states):
   for state in states:
-    for finalState in finalStates:
-       if state == finalState:
-         return True
-  return False
-  
+    if state in finalStates:
+      return True
+  else:
+    return False
+
 
 def menu():
+  """Allows the user to choose an option for using the program.
+
+  Parameters
+  -------
+  None
+  
+  """
   exit = False
 
   while not exit:
+    #Ask user for option
     print("==========================================")
     print("Welcome to the NDFA-Lambda string evaluator! ")
     print("1. Evaluate a String")
@@ -186,18 +159,25 @@ def menu():
     print("")
     if option == "1":
       stri = ""
+    
+      filename= input("Please enter the name of the file (Ex: test1.txt): ")
+      initialSetup(filename)
+    
       
-      print("Note: If you want to load your own Automata please copy-paste it in test1.txt")
+      # print("Note: If you want to load your own Automata please copy-paste it in test1.txt")
       print("---------------------------")
+      #Ask user for string
       stri= input("Enter the String you want to evaluate: ")
       print("")
-      evaluatedString = evaluateString("q0",stri)
-      print("Final set of states", evaluatedString)
+      #Evaluate string with User string
+      extended = etf("q0","x"+stri)
+      print("Final set of states", extended)
       print("")
 
       print("List of final states in the automata", finalStates)
       print("")
-      if isFinalState(evaluatedString):
+       #Evaluate states form evaluatedString() and run isFinalState()
+      if isFinalState(finalStates ,extended):
         print("The string is accepted")
       else:
         print("The string is not accepted")
@@ -211,8 +191,3 @@ def menu():
       print("Please enter a valid option :(")
       
 menu()
-
-
-
-      
-  
