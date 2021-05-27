@@ -15,28 +15,14 @@ def initialSetup(filename):
   -------
   filename: The file where the Automata is defined.
   """
-  
-  with open("./" + filename , "r") as f:
-    contents = f.read().splitlines()
-    
-  states = contents[0].split(",")
-  alphabet=contents[1].split(",")
-  alphabet.append("lambda")
-  initialState = contents[2]
-  global finalStates 
-  finalStates= contents[3].split(",")
-  
- 
+
   def generateStates():
     """
     Generates the states for the Automata.
     """
     for state in states:
       dic[state]= {}
-      
-  generateStates()
-  
-
+   
   def generateTransitions():
     """
     Generates the transitions on the file, saving them on the dictionary.
@@ -48,12 +34,30 @@ def initialSetup(filename):
         if character not in dic[current[0]]:
           dic[current[0]][character]= []
       dic[current[0]][current[1]] = currentTransitions
-      
-  generateTransitions()
 
 
+  
+  try:
+    with open("./" + filename , "r") as f:
+      """
+        Generates the states and characters according to the file selected.
+      """
+      contents = f.read().splitlines()
+      states = contents[0].split(",")
+      alphabet=contents[1].split(",")
+      alphabet.append("lambda")
+      initialState = contents[2]
+      global finalStates 
+      finalStates= contents[3].split(",")
 
-###################################################
+      generateStates()
+      generateTransitions()
+
+    return True
+  except (FileNotFoundError, IsADirectoryError):
+    print("Oops! That was no valid filename. Please try again ")
+    return False
+ 
 def transitionFunction(state, character):
   """
   Processes the string with the transition function and returns a dictionary with the transitions.
@@ -64,10 +68,7 @@ def transitionFunction(state, character):
   character: the character that has a transition with the state.
   """
   return dic[state][character]
-###################################################
 
-
-###################################################
 def lambdaFunction(state):
   """
   Processes the states with the lambda function, returning a set of states.
@@ -89,20 +90,42 @@ def lambdaFunction(state):
           visited.append(state)
           result.append(state)
   return result
-###################################################
 
 
-##################################################
+
+def lambdaFunction2(states):
+  visited = []
+  result=[]
+  for lstate in states:    
+    if lstate not in result:
+      result.append(lstate)
+  for state in result:
+    current= transitionFunction(state, "lambda")
+    if current != None:
+      for state in current:
+        if state not in visited and state not in result:
+          
+          visited.append(state)
+          result.append(state)
+          print("===>", state, result )
+  return result
+
+
+
 def etf(state, string):
   """
-  
+  Processes the states with the extended transition function and a string. 
+
+  Parameters
+  ----------
+  State: the states i
+
   """
   if len(string) == 1:
     return lambdaFunction(state)
   else:
     firstPart = string[:-1]
     lastChar= string[-1]
-    # print(firstPart, lastChar)
     
     etfRes = etf("q0", firstPart)
     
@@ -115,7 +138,7 @@ def etf(state, string):
       for c in current:
        if c not in tfRes:
          tfRes.append(c)
-      # print("The result of the extended transition function is:", tfRes)
+  
 
     lfRes = []
    
@@ -127,10 +150,16 @@ def etf(state, string):
          lfRes.append(cu)
 
     return lfRes
-###################################################
-
 
 def isFinalState(finalStates, states):
+  """
+  Checks if the states given are final States in the Automata.
+
+  Parameters
+  -----
+  finalStates: The list of states that are final in the automata
+  stateS: The states that are going to be checked.
+  """
   for state in states:
     if state in finalStates:
       return True
@@ -140,16 +169,10 @@ def isFinalState(finalStates, states):
 
 def menu():
   """Allows the user to choose an option for using the program.
-
-  Parameters
-  -------
-  None
-  
   """
   exit = False
 
   while not exit:
-    #Ask user for option
     print("==========================================")
     print("Welcome to the NDFA-Lambda string evaluator! ")
     print("1. Evaluate a String")
@@ -160,23 +183,23 @@ def menu():
     if option == "1":
       stri = ""
     
+     
       filename= input("Please enter the name of the file (Ex: test1.txt): ")
-      initialSetup(filename)
-    
-      
-      # print("Note: If you want to load your own Automata please copy-paste it in test1.txt")
+      while not initialSetup(filename):
+        filename= input("Please enter the name of the file (Ex: test1.txt): ")
+        
+
       print("---------------------------")
-      #Ask user for string
       stri= input("Enter the String you want to evaluate: ")
       print("")
-      #Evaluate string with User string
+    
       extended = etf("q0","x"+stri)
       print("Final set of states", extended)
       print("")
 
       print("List of final states in the automata", finalStates)
       print("")
-       #Evaluate states form evaluatedString() and run isFinalState()
+     
       if isFinalState(finalStates ,extended):
         print("The string is accepted")
       else:
@@ -189,5 +212,7 @@ def menu():
         exit = True
     else:
       print("Please enter a valid option :(")
-      
+
+
 menu()
+print("LF", lambdaFunction("q3") + lambdaFunction("q5"), "LF2", lambdaFunction2(["q3", "q5"]))
