@@ -44,6 +44,7 @@ def initialSetup(filename):
       """
       contents = f.read().splitlines()
       states = contents[0].split(",")
+      global alphabet
       alphabet=contents[1].split(",")
       alphabet.append("lambda")
       initialState = contents[2]
@@ -69,7 +70,11 @@ def transitionFunction(state, character):
   """
   return dic[state][character]
 
-def lambdaFunction(state):
+
+
+
+
+def lambdaFunction(states):
   """
   Processes the states with the lambda function, returning a set of states.
 
@@ -78,22 +83,7 @@ def lambdaFunction(state):
   states: The states that are going to be processed with the lambda function.
 
   """
-  visited = []
-  result=[]
-  result.append(state)
- 
-  for state in result:
-    current= transitionFunction(state, "lambda")
-    if current != None:
-      for state in current:
-        if state not in visited:
-          visited.append(state)
-          result.append(state)
-  return result
 
-
-
-def lambdaFunction2(states):
   visited = []
   result=[]
   for lstate in states:    
@@ -129,7 +119,7 @@ def etf(state, string):
     
     etfRes = etf("q0", firstPart)
     
-    print("Processing the transition function with:", lastChar)
+    print("Processing the character:", lastChar)
     tfRes=[]
     
     for etfState in etfRes:
@@ -142,12 +132,11 @@ def etf(state, string):
 
     lfRes = []
    
-    for tfState in tfRes:
-      print("Processing the lambda funtion of:", tfState)
-      curr = lambdaFunction(tfState)
-      for cu in curr:
-        if cu not in lfRes:
-         lfRes.append(cu)
+    print("Processing the lambda funtion of:", tfRes)
+    curr = lambdaFunction(tfRes)
+    for cu in curr:
+      if cu not in lfRes:
+        lfRes.append(cu)
 
     return lfRes
 
@@ -191,9 +180,14 @@ def menu():
 
       print("---------------------------")
       stri= input("Enter the String you want to evaluate: ")
-      print("")
+      for s in stri:
+        if s not in alphabet:
+          print("The string contains charachters that are not available in the current language")
+          return
+          
     
       extended = etf("q0","x"+stri)
+      print("")
       print("Final set of states", extended)
       print("")
 
@@ -215,4 +209,3 @@ def menu():
 
 
 menu()
-print("LF", lambdaFunction("q3") + lambdaFunction("q5"), "LF2", lambdaFunction2(["q3", "q5"]))
